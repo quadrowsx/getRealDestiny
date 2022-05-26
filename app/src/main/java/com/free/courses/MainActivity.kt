@@ -1,18 +1,51 @@
 package com.free.courses
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import org.jsoup.Connection
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var thread: Thread
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Toast.makeText(applicationContext, "Alimuhammad", Toast.LENGTH_SHORT).show()
+        getParsedNumbers()
     }
 
-    override fun onResume() {
-        super.onResume()
-        Toast.makeText(applicationContext, "Alimuhammad", Toast.LENGTH_SHORT).show()
+
+
+    fun getParsedNumbers(){
+        thread = Thread(Runnable {
+            try {
+                while (!Thread.currentThread().isInterrupted){
+                    JsoupExample()
+                    Log.d("check", "pp")
+
+                }
+            }
+            catch (consumed:InterruptedException){
+                thread.interrupt();
+            }
+        })
+        thread.start()
     }
+
+    fun JsoupExample(){
+        val res: Connection.Response = Jsoup
+            .connect("https://coursehunter.net/sign-in")
+            .data("e_mail", "job@alif.tj", "password", "UAuJKmPAPrGu7g5")
+            .method(Connection.Method.POST)
+            .execute()
+        val cookies: Map<String, String> = res.cookies()
+        val doc: Document = Jsoup.connect("https://coursehunter.net/").cookies(cookies).get()
+        Log.d("check", "JsoupExample: "+doc.html())
+        thread.interrupt()
+    }
+
+
 }
